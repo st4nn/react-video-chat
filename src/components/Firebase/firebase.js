@@ -1,7 +1,7 @@
 import app from 'firebase/app'
 import "firebase/firebase-firestore";
 
-import config from "./config";
+import config from "./config.json";
 
 class Firebase {
     constructor() {
