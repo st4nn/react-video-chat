@@ -26,7 +26,6 @@ class Setup extends React.Component{
         return (
             <Router 
                 firebase={this.props.firebase} 
-                language={this.state.language}
                 handleMainState={this.handleState}
                 />
         )

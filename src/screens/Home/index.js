@@ -1,6 +1,8 @@
 import React from "react";
 import View from "./view";
 
+import getRandomNumber from "utils/getRandomNumber";
+
 class Home extends React.Component{
     constructor(props){
         super(props);
@@ -38,7 +40,3 @@ class Home extends React.Component{
 }
 
 export default Home;
-
-function getRandomNumber(min, max){
-    return Math.floor(Math.random() * max) + min;
-}

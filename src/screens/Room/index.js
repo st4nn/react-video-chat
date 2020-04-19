@@ -1,6 +1,8 @@
 import React from "react";
 import WebRTC from "components/WebRTC";
 
+import passwordGenerator from "utils/passwordGenerator";
+
 import View from "./view";
 
 class Room extends React.Component{
@@ -12,8 +14,15 @@ class Room extends React.Component{
             { params = {}} = match,
             { rid = false} = params;
 
+        let browser_id = localStorage.getItem("browser_id");
+        if (browser_id === null){
+            browser_id = passwordGenerator(22, true);
+            localStorage.setItem(browser_id);
+        }
+
         this.state = {
             rid,
+            browser_id,
             isLoading: true,
             hasAudio: true,
             audioLoading: true,
@@ -46,24 +55,38 @@ class Room extends React.Component{
         }
     }
     componentWillUnmount(){
-        this.webRTC.destroy();
+        this.webRTC.hangUp();
     }
     getLocalStream(){
         const 
-            { getLocalStream } = this,
-            { history } = this.props,
+            { getLocalStream, browser_id } = this,
+            { rid } = this.state,
+            { history, firebase } = this.props,
             self = this;
+
         if (this.videoRef.current !== null){
             this.webRTC = new WebRTC({ 
                 localVideo: this.videoRef.current, 
-                remoteVideo: this.remoteVideoRef.current
+                remoteVideo: this.remoteVideoRef.current,
+                firebaseInstance: firebase,
+                browser_id
             });
 
             this.webRTC.openUserMedia({})
             .then(()=>{
-                self.setState({isLoading: false, videoLoading: false, audioLoading: false});
+                firebase.firestore().collection("rooms").doc(rid).get()
+                .then((doc)=>{
+                    if (doc.exists){
+                        self.webRTC.join(rid);
+                    } else{
+                        self.webRTC.createRoom(rid);
+                    }
+                    self.setState({isLoading: false, videoLoading: false, audioLoading: false});
+                })
+                .catch(error => console.error(error));
             })
-            .catch(()=>{
+            .catch((error)=>{
+                console.error(error);
                 history.push("/");
             });
 

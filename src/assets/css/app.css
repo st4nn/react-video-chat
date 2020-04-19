@@ -112,6 +112,11 @@ video{
     background: transparent;
     bottom: 1rem;
     height: auto;
+    max-height: 30vh;
+    max-width: 30vh;
+    min-height: 25vh;
+    min-width: 25vh;
+    object-fit: cover;
     position: fixed;
     right: 1rem;
     width: 40%;

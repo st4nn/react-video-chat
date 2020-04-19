@@ -5,7 +5,7 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Home from "screens/Home";
 import Room from "screens/Room";
 
-const Router = ({props})=>{
+const Router = (props)=>{
     return (
         <BrowserRouter>
             <Switch>

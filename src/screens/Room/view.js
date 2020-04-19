@@ -12,7 +12,7 @@ const View = ({ containerRef, videoRef, remoteVideoRef, isLoading, audioLoading,
             )}
             <div className="video-container">
                 <video className="main-video" ref={videoRef} muted autoPlay playsInline></video>
-                <video className="second-video" ref={remoteVideoRef} muted autoPlay playsInline></video>
+                <video className="second-video" ref={remoteVideoRef} autoPlay playsInline></video>
             </div>
             <ButtonsContainer>
                 <button onClick={handleAudio} className={(hasAudio ? "" : " selected")}>
