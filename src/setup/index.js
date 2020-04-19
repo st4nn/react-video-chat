@@ -1,7 +1,36 @@
 import React from "react";
+import { withFirebase } from "components/Firebase";
 
-const Setup = ()=>{
-    return <h1>Hola mundo</h1>
+import Router from "./Router";
+
+import "assets/css/app.css";
+import "assets/css/boxicons.css";
+
+class Setup extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state = {  };
+        this.handleState = this.handleState.bind(this);
+    }
+    handleState(data){
+        const self = this;
+        
+        return new Promise((resolve) => {
+            self.setState(data, ()=>{
+                resolve(self.state);
+            })
+        });
+    }
+    render(){
+        return (
+            <Router 
+                firebase={this.props.firebase} 
+                language={this.state.language}
+                handleMainState={this.handleState}
+                />
+        )
+    }
 }
 
-export default Setup;
+export default withFirebase(Setup);
