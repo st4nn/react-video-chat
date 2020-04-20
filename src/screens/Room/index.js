@@ -17,7 +17,7 @@ class Room extends React.Component{
         let browser_id = localStorage.getItem("browser_id");
         if (browser_id === null){
             browser_id = passwordGenerator(22, true);
-            localStorage.setItem(browser_id);
+            localStorage.setItem("browser_id", browser_id);
         }
 
         this.state = {
@@ -59,10 +59,11 @@ class Room extends React.Component{
     }
     getLocalStream(){
         const 
-            { getLocalStream, browser_id } = this,
-            { rid } = this.state,
+            { getLocalStream  } = this,
+            { rid, browser_id } = this.state,
             { history, firebase } = this.props,
             self = this;
+
 
         if (this.videoRef.current !== null){
             this.webRTC = new WebRTC({ 

@@ -25,7 +25,6 @@ function WebRTC({ localVideo, remoteVideo, firebaseInstance = {}, browser_id}){
 }
 
 const getUserMedia = async function({ audio = true, video = true }){
-    console.log({video, audio});
     return await navigator.mediaDevices.getUserMedia( { video, audio });
 }
 
@@ -117,7 +116,7 @@ WebRTC.prototype.createRoom = async function(roomId){
     console.log('Created offer:', offer);
 
     const roomWithOffer = {
-        'offer': {
+        [browserId] : {
             type: offer.type,
             sdp: offer.sdp,
         },
@@ -137,12 +136,19 @@ WebRTC.prototype.createRoom = async function(roomId){
     });
 
     // Listening for remote session description below
-    roomRef.onSnapshot(async snapshot => {
+    roomRef.onSnapshot(snapshot => {
         const data = snapshot.data();
-        if (!peerConnection.currentRemoteDescription && data && data.answer) {
-            console.log('Got remote description: ', data.answer);
-            const rtcSessionDescription = new RTCSessionDescription(data.answer);
-            await peerConnection.setRemoteDescription(rtcSessionDescription);
+        const 
+            clients = Object.keys(data);
+            clients.splice(clients.indexOf(browserId), 1);
+
+
+        if (!peerConnection.currentRemoteDescription && data) {
+            clients.forEach(async (client)=>{
+                console.log('Got remote description: ', data[client]);
+                const rtcSessionDescription = new RTCSessionDescription(data[client]);
+                await peerConnection.setRemoteDescription(rtcSessionDescription);
+            });
         }
     });
     // Listening for remote session description above
@@ -195,21 +201,28 @@ WebRTC.prototype.join = async function (roomId) {
         });
 
         // Code for creating SDP answer below
-        const offer = roomSnapshot.data().offer;
-        console.log('Got offer:', offer);
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-        const answer = await peerConnection.createAnswer();
-        console.log('Created answer:', answer);
-        await peerConnection.setLocalDescription(answer);
+        const hosts = Object.keys(roomSnapshot.data());
 
-        const roomWithAnswer = {
-            answer: {
-                type: answer.type,
-                sdp: answer.sdp,
-            },
-        };
-        await roomRef.update(roomWithAnswer);
-        // Code for creating SDP answer above
+        hosts.forEach(async (host)=>{
+            if (host !== browserId){
+                const offer = roomSnapshot.data()[host];
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+                const answer = await peerConnection.createAnswer();
+                console.log('Created answer:', answer);
+                await peerConnection.setLocalDescription(answer);
+                console.log('Got offer:', offer);
+
+                const roomWithAnswer = {
+                    [browserId]: {
+                        type: answer.type,
+                        sdp: answer.sdp,
+                    },
+                };
+                await roomRef.update(roomWithAnswer);
+                // Code for creating SDP answer above
+            }
+        });
+
 
         // Listening for remote ICE candidates below
         roomRef.collection('callerCandidates').onSnapshot(snapshot => {

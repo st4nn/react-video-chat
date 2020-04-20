@@ -3,6 +3,7 @@ import React from "react";
 import { Container, ButtonsContainer, LoadingContainer } from "./Styles";
 
 const View = ({ containerRef, videoRef, remoteVideoRef, isLoading, audioLoading, hasAudio, handleAudio, videoLoading, hasVideo, handleVideo, handleFullScreen, hasFullScreen, onExit })=>{
+    const [mainVideoProfile, setMainVideoProfile] = React.useState(true);
     return(
         <Container ref={containerRef}>
             {(isLoading) && (
@@ -11,8 +12,8 @@ const View = ({ containerRef, videoRef, remoteVideoRef, isLoading, audioLoading,
                 </LoadingContainer>
             )}
             <div className="video-container">
-                <video className="main-video" ref={videoRef} muted autoPlay playsInline></video>
-                <video className="second-video" ref={remoteVideoRef} autoPlay playsInline></video>
+                <video onClick={() => { setMainVideoProfile(true)}} className={mainVideoProfile ? "main-video" : "second-video"} ref={videoRef} muted autoPlay playsInline></video>
+                <video onClick={() => { setMainVideoProfile(false)}} className={!mainVideoProfile ? "main-video" : "second-video"} ref={remoteVideoRef} autoPlay playsInline></video>
             </div>
             <ButtonsContainer>
                 <button onClick={handleAudio} className={(hasAudio ? "" : " selected")}>
